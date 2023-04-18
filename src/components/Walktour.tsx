@@ -50,7 +50,7 @@ export interface WalktourOptions {
   disableSmoothScroll?: boolean;
   allowForeignTarget?: boolean;
   nextOnTargetClick?: boolean;
-  validateNextOnTargetClick?: () => Promise<boolean>;
+  validateNextOnTargetClick?: (event: MouseEvent) => Promise<boolean>;
 }
 
 export interface Step extends WalktourOptions {
