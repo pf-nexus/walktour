@@ -215,19 +215,21 @@ export const takeActionIfValid = async (action: () => void, actionValidator?: ()
   }
 }
 
-export const setNextOnTargetClick = (target: HTMLElement, next: (fromTarget?: boolean) => void, validateNext?: () => Promise<boolean>): (() => void) => {
+export const setNextOnTargetClick = (target: HTMLElement, next: (fromTarget?: boolean) => void, validateNext?: (event: MouseEvent) => Promise<boolean>): (() => void) => {
   if (!target) {
     return;
   }
 
   // if valid, call a handler which 1. calls the tetheredAction function and 2. removes itself from the target
-  const clickHandler = () => {
+  const clickHandler = (event: MouseEvent) => {
     const actionWithCleanup = () => {
       next(true);
       target.removeEventListener('click', clickHandler);
     }
 
-    takeActionIfValid(actionWithCleanup, validateNext)
+    const actionWithMouseEvent = validateNext ? async () => await validateNext(event) : undefined
+
+    takeActionIfValid(actionWithCleanup, actionWithMouseEvent)
   }
 
   target.addEventListener('click', clickHandler);
