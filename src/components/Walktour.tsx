@@ -323,12 +323,24 @@ export const Walktour = (props: WalktourProps) => {
     tooltipPosition
   };
 
+  const customCloseFunction = customCloseFunc
+    ? () => customCloseFunc(baseLogic)
+    : baseLogic.close
+
   const tourLogic: WalktourLogic = {
     ...baseLogic,
-    ...customNextFunc && { next: (fromTarget?: boolean) => customNextFunc(baseLogic, fromTarget) },
-    ...customPrevFunc && { prev: () => customPrevFunc(baseLogic) },
-    ...customCloseFunc && { close: () => customCloseFunc(baseLogic) }
-  };
+    ...(customNextFunc && {
+      next: (fromTarget?: boolean) =>
+        customNextFunc(
+          { ...baseLogic, close: customCloseFunction },
+          fromTarget
+        ),
+    }),
+    ...(customPrevFunc && {
+      prev: () => customPrevFunc({ ...baseLogic, close: customCloseFunction }),
+    }),
+    close: customCloseFunction,
+  }
 
   const keyPressHandler = (event: React.KeyboardEvent) => {
     switch (event.key) {
